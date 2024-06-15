@@ -9,6 +9,8 @@
 #include <QFile>
 #include <QFileDialog>
 #include "qdom.h"
+#include "filesrvdlg.h" // 服务器类
+#include "filecntdlg.h" // 客户端类
 
 class FileSrvDlg;
 
@@ -37,7 +39,7 @@ public:
     void recvFileName(QString name, QString hostip, QString rmtname, QString filename);
 
 protected:
-    void closeEvent(QCloseEvent *event); // 重写关闭窗口事件以便发送用户离线通知消息
+    void closeEvent(QCloseEvent *); // 重写关闭窗口事件以便发送用户离线通知消息
 
 private slots:
     void on_sendPushButton_clicked();
@@ -46,7 +48,7 @@ private slots:
 
     void on_searchPushButton_clicked(); // 搜索线上所有用户
 
-    void getSfileName(QString);
+    void getSfileName(QString); // 获取服务器类sendFileName()信号发送过来的文件名
 
     void on_transPushButton_clicked(); // 传输文件按钮单击事件
 

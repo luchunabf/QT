@@ -226,6 +226,17 @@
      <string>发送</string>
     </property>
    </widget>
+   <zorder>label</zorder>
+   <zorder>label_2</zorder>
+   <zorder>searchPushButton</zorder>
+   <zorder>userListTableWidget</zorder>
+   <zorder>userLabel</zorder>
+   <zorder>label_3</zorder>
+   <zorder>chatTextBrowser</zorder>
+   <zorder>label_5</zorder>
+   <zorder>chatTextEdit</zorder>
+   <zorder>sendPushButton</zorder>
+   <zorder>transPushButton</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

@@ -21,8 +21,10 @@ void MainWindow::initMainWindow()
     myUdpSocket->bind(myUdpPort, QUdpSocket::ShareAddress|QUdpSocket::ReuseAddressHint);
     connect(myUdpSocket, &QUdpSocket::readyRead, this, &MainWindow::recvAndProcessChatMsg);
 
-    // myfsrv = new FileSrvDlg(this);
-    // connect(myfsrv, &FileSrvDlg::sendFileName, this, &MainWindow::getSfileName);
+    // 创建服务器类对象
+    myfsrv = new FileSrvDlg(this);
+    // 当服务器sendFileName发送文件信号触发后，执行getSfileName获取服务器类sendFileName()信号发送过来的文件名
+    connect(myfsrv, &FileSrvDlg::sendFileName, this, &MainWindow::getSfileName);
 }
 
 void MainWindow::onLine(QString name, QString time)
@@ -30,18 +32,38 @@ void MainWindow::onLine(QString name, QString time)
     bool notExist = ui->userListTableWidget->findItems(name, Qt::MatchExactly).isEmpty();
     if(notExist)
     {
+        // ui->userListTableWidget->setRowCount(1);
+        // ui->userListTableWidget->setColumnCount(1);
+        // //在末尾插入数据
+        // int curRow = ui->userListTableWidget->rowCount();
+        // ui->userListTableWidget->insertRow(curRow);
+
+        // QTableWidgetItem *newuser = new QTableWidgetItem;
+        // newuser->setText(name);
+        // ui->userListTableWidget->setItem(curRow,0,newuser); // 然后再setItem添加数据
+
         QTableWidgetItem *newuser = new QTableWidgetItem(name);
+        // ui->userListTableWidget->setRowCount(2);
+        // ui->userListTableWidget->setRowCount(0); // 不加行数也可以insert
+        ui->userListTableWidget->setColumnCount(1); // 【必须添加列数，否则数据不显示】
         ui->userListTableWidget->insertRow(0); // 先插入一行空数据
         ui->userListTableWidget->setItem(0,0,newuser); // 然后再setItem添加数据
         ui->chatTextBrowser->setTextColor(Qt::gray);
         ui->chatTextBrowser->setCurrentFont(QFont("Times New Roman", 12));
         ui->chatTextBrowser->append(tr("%1 %2 上线").arg(time).arg(name));
-        sendChatMsg(OnLine);
+        // sendChatMsg(OnLine); // 【程序崩溃】这里接收到消息之后，继续发送消息，构成死循环
     }
 }
 
 void MainWindow::offLine(QString name, QString time)
 {
+    // 这里未添加判空，直接解引用，当找不到结果时，程序崩溃
+    bool notExist = ui->userListTableWidget->findItems(name, Qt::MatchExactly).isEmpty();
+    if(notExist)
+    {
+        return;
+    }
+
     int row = ui->userListTableWidget->findItems(name, Qt::MatchExactly).first()->row();
     ui->userListTableWidget->removeRow(row);
     ui->chatTextBrowser->setTextColor(Qt::gray);
@@ -82,6 +104,7 @@ void MainWindow::sendChatMsg(ChatMsgType msgType, QString rmtName)
 QString MainWindow::getLocHostIp()
 {
     QList<QHostAddress> addrlist = QNetworkInterface::allAddresses();
+    // if(addrlist.isEmpty()) return "";
     foreach (QHostAddress addr, addrlist) {
         if(addr.protocol() == QAbstractSocket::IPv4Protocol)
             return addr.toString();
@@ -97,12 +120,34 @@ QString MainWindow::getLocChatMsg()
     return chatmsg;
 }
 
+// 判断收到UDP消息时，是否要接收该文件
 void MainWindow::recvFileName(QString name, QString hostip, QString rmtname, QString filename)
 {
-
+    if(myname == rmtname)
+    {
+        int result = QMessageBox::information(this, tr("收到文件"),
+                                              tr("好友 %1 给您发文件：\r\n%2，是否接收？").arg(
+                                                                name).arg(filename),
+                                              QMessageBox::Yes | QMessageBox::No);
+        if(result == QMessageBox::Yes)
+        {
+            QString fname = QFileDialog::getSaveFileName(0, tr("保存"), filename);
+            if(!fname.isEmpty())
+            {
+                FileCntDlg *fcnt = new FileCntDlg(this);
+                fcnt->getLocPath(fname);
+                fcnt->getSrvAddr(QHostAddress(hostip));
+                fcnt->show();
+            }
+        }
+        else
+        {
+            sendChatMsg(RefFile, name);
+        }
+    }
 }
 
-void MainWindow::closeEvent(QCloseEvent *event)
+void MainWindow::closeEvent(QCloseEvent *)
 {
     sendChatMsg(OffLine);
 }
@@ -150,7 +195,7 @@ void MainWindow::recvAndProcessChatMsg()
             break;
         case RefFile:
             read >> name >> hostip >> rname;
-            // if(myname == rname) myfsrv->cntRefused();
+            if(myname == rname) myfsrv->cntRefused();
             break;
         default:
             break;
@@ -167,15 +212,30 @@ void MainWindow::on_searchPushButton_clicked()
     sendChatMsg(OnLine);
 }
 
-void MainWindow::getSfileName(QString)
+// fname是信号传过来的
+void MainWindow::getSfileName(QString fname)
 {
+    myFileName = fname;
+    int row = ui->userListTableWidget->currentRow();
+    QString rmtName = "";
+    if(row >= 0)
+    {
+        rmtName = ui->userListTableWidget->item(row, 0)->text(); // 小心程序崩溃
+    }
 
+    sendChatMsg(SfileName, rmtName);
 }
 
 
 void MainWindow::on_transPushButton_clicked()
 {
+    if(ui->userListTableWidget->selectedItems().isEmpty())
+    {
+        QMessageBox::warning(0, tr("选择好友"), tr("请先选择文件接收方！"), QMessageBox::Ok);
+        return;
+    }
 
+    myfsrv->show(); // 展示QDialog
 }
 
 

@@ -1,2 +1,6 @@
 1.直接在界面设计器里面添加图片不会显示
 	解决：需要添加至资源文件
+2.QTableWidget不显示数据
+	解决：添加 ui->userListTableWidget->setColumnCount(1);即可
+3.ui->userListTableWidget->findItems(name, Qt::MatchExactly).first()->row();查找函数findItems未找到结果时会导致程序崩溃
+	解决：添加结果判空处理
