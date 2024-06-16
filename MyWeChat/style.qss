@@ -1,0 +1,26 @@
+QMainWindow
+{
+        background-color:rgb(0,255,0);
+	
+        border-style:solid;
+        border-width:2px;
+        border-color:red;
+}
+
+QPushButton
+{
+    background-color:rgb(255,122,158);
+
+    border-style:solid;
+    border-width:2px;
+    border-color:red;
+}
+
+QLabel
+{
+    background-color:rgb(255,0,0);
+
+    border-style:solid;
+    border-width:2px;
+    border-color:red;
+}

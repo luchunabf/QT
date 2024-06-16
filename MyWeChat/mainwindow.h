@@ -52,6 +52,8 @@ private slots:
 
     void on_transPushButton_clicked(); // 传输文件按钮单击事件
 
+    void on_changeQssPushButton_clicked(); // 添加qss文件换肤功能
+
 private:
     Ui::MainWindow *ui;
     QString myname = ""; // 本端当前的用户名

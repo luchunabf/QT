@@ -4,3 +4,7 @@
 	解决：添加 ui->userListTableWidget->setColumnCount(1);即可
 3.ui->userListTableWidget->findItems(name, Qt::MatchExactly).first()->row();查找函数findItems未找到结果时会导致程序崩溃
 	解决：添加结果判空处理
+	
+https://github.com/luchunabf/QT/tree/main/emarket
+https://github.com/luchunabf/QT/tree/main/MyWeChat
+

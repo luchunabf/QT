@@ -239,22 +239,14 @@ void MainWindow::on_transPushButton_clicked()
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void MainWindow::on_changeQssPushButton_clicked()
+{
+    // 添加换肤功能
+    QFile file(":/style.qss");
+    file.open(QFile::ReadOnly);
+    QTextStream filetext(&file);
+    QString stylesheet = filetext.readAll();
+    this->setStyleSheet(stylesheet);
+    file.close();
+}
 

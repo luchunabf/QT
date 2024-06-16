@@ -6,5 +6,6 @@
         <file>title.jpg</file>
         <file>tool.jpg</file>
         <file>wei.jpg</file>
+        <file>style.qss</file>
     </qresource>
 </RCC>
